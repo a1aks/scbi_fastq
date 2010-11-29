@@ -29,6 +29,16 @@ class FastqFile
 
     @num_seqs = 0
     @fastq_type=fastq_type
+    
+    @qual_offset = 33
+    
+    if @fastq_type == :ilumina
+      @qual_offset = 64
+    elsif @fastq_type == :solexa
+       # $Q = 10 * log(1 + 10 ** (ord($sq) - 64) / 10.0)) / log(10)
+       @qual_offset = 33
+    end
+    
     @qual_to_array = qual_to_array
     
     @qual_to_phred = qual_to_phred
@@ -147,7 +157,7 @@ class FastqFile
        @num_seqs += 1
        
        if @qual_to_phred
-         seq_qual=seq_qual.each_char.map{|e| (e.ord-33)}
+         seq_qual=seq_qual.each_char.map{|e| (e.ord-@qual_offset)}
 
          if !@qual_to_array
              seq_qual=seq_qual.join(' ')
