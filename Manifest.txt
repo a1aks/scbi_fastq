@@ -4,6 +4,7 @@ PostInstall.txt
 README.rdoc
 Rakefile
 lib/scbi_fastq.rb
+lib/scbi_fastq/fastq_file.rb
 script/console
 script/destroy
 script/generate
