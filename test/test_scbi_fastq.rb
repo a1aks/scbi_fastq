@@ -37,7 +37,6 @@ class TestScbiFastq < Test::Unit::TestCase
 			fqr=FastqFile.new(@test_file)
 
 			i=1
-			n,s,q = ['']*3
 			
 			fqr.each do |n,s,q|
 			  
@@ -49,8 +48,30 @@ class TestScbiFastq < Test::Unit::TestCase
 			end
 			 
 		  fqr.close			
+  end
 
-   end
+  def test_each_comments
+
+    	 # make new file and fill with data
+		  fill_file(100) 	
+		
+
+			fqr=FastqFile.new(@test_file)
+
+			i=1
+			
+			fqr.each do |n,s,q,c|
+			  
+			  assert_equal(@seq_name+i.to_s,n)
+			  assert_equal(@seq_fasta*i,s)
+			  assert_equal((@seq_qual*i*@seq_fasta.length).join(' '),q)
+			  assert_equal('comments',c)
+
+				i+=1
+			end
+			 
+		  fqr.close			
+  end
 
   
   # def test_open_file
