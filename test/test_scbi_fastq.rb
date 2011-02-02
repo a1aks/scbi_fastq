@@ -6,23 +6,24 @@ class TestScbiFastq < Test::Unit::TestCase
    	@test_file='/tmp/sanger.fastq';
   	
   	@seq_fasta='ACTG'
-		@seq_qual=[25]
+		@seq_qual=[31]
 	  @seq_name='SEQ'
 	  
   end
   
   
   def fill_file(n,offset=33)
-  	f=File.new(@test_file,'w')
+  	f=FastqFile.new(@test_file,'w')
   	
   	n.times do |c|
   	  i = c+1
-  	  name = "@#{@seq_name+i.to_s} comments"
   	  
-  		f.puts(name)
-  		f.puts(@seq_fasta*i)
-  		f.puts('+'+name)
-  		f.puts((@seq_qual*i*@seq_fasta.length).map{|e| (e+offset).chr}.join)
+  	  name = "#{@seq_name+i.to_s}"
+  	  f.write_seq(name,@seq_fasta*i,(@seq_qual*i*@seq_fasta.length),'comments')
+      # f.puts('@'+name)
+      # f.puts(@seq_fasta*i)
+      # f.puts('+'+name)
+      # f.puts((@seq_qual*i*@seq_fasta.length).map{|e| (e+offset).chr}.join)
   	end
   	
   	f.close
@@ -39,10 +40,10 @@ class TestScbiFastq < Test::Unit::TestCase
 			i=1
 			
 			fqr.each do |n,s,q|
-			  
+
 			  assert_equal(@seq_name+i.to_s,n)
 			  assert_equal(@seq_fasta*i,s)
-			  assert_equal((@seq_qual*i*@seq_fasta.length).join(' '),q)
+			  assert_equal((@seq_qual*i*@seq_fasta.length),q)
 
 				i+=1
 			end
@@ -64,7 +65,7 @@ class TestScbiFastq < Test::Unit::TestCase
 			  
 			  assert_equal(@seq_name+i.to_s,n)
 			  assert_equal(@seq_fasta*i,s)
-			  assert_equal((@seq_qual*i*@seq_fasta.length).join(' '),q)
+			  assert_equal((@seq_qual*i*@seq_fasta.length),q)
 			  assert_equal('comments',c)
 
 				i+=1
