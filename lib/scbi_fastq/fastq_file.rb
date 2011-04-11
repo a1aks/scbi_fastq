@@ -156,6 +156,26 @@ class FastqFile
 		end
     
   end
+
+  # creates fastq otuput in sanger format
+  def self.to_fastq(seq_name,seq_fasta,seq_qual,comments='')
+    
+    res=[]
+    
+	  name = ""
+	  
+		res << ("@#{seq_name} #{comments}")
+		res << (seq_fasta)
+		res << ("+#{seq_name} #{comments}")
+		
+		if seq_qual.is_a?(Array)
+		  res<<(seq_qual.map{|e| (e+33).chr}.join)
+	  else
+		  res<<(seq_qual.split(/\s+/).map{|e| (e.to_i+33).chr}.join)
+		end
+		
+    return res
+  end
   
   def with_qual?
     true
@@ -197,7 +217,7 @@ class FastqFile
           seq_name = $1
           comments=$2
         else
-          raise "Invalid sequence name in #{line}"
+          raise "Invalid sequence name in #{name_line}"
         end
       
         # parse fasta
