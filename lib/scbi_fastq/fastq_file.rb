@@ -108,7 +108,7 @@ class FastqFile
  
   
   #------------------------------------
-  # Scans all sequences
+  # Iterate over all sequences
   #------------------------------------
   def each
         
@@ -125,6 +125,7 @@ class FastqFile
   	
   end
 
+  # goto first position in file
   def rewind
      
      @num_seqs = 0 ;
@@ -133,7 +134,7 @@ class FastqFile
   end
 
   #------------------------------------
-  # Scans a file, firing events to process content
+  # Get next sequence
   #------------------------------------
   def next_seq
     #init variables
@@ -141,7 +142,7 @@ class FastqFile
   	return res
   end
   
-  
+  # write sequence to file in sanger format
   def write_seq(seq_name,seq_fasta,seq_qual,comments='')
 	  name = ""
 	  
@@ -157,6 +158,7 @@ class FastqFile
     
   end
 
+  
   # creates fastq otuput in sanger format
   def self.to_fastq(seq_name,seq_fasta,seq_qual,comments='')
     
@@ -185,7 +187,7 @@ class FastqFile
   private 
   
   #------------------------------------
-  #  Read one sequence fasta
+  #  Read one sequence in fastq
   #------------------------------------
   # @GEM-108-D02
   # AAAAGCTGG
@@ -241,166 +243,6 @@ class FastqFile
       rescue EOFError
         raise "Bad format in FastQ file"
       end
-    end
-    
-    return [seq_name,seq_fasta,seq_qual,comments]
-  end
-
-  
-  def read_fastq_old3
-
-    seq_name = nil
-    seq_fasta = nil
-    seq_qual = nil
-    comments = nil
-    
-    reading = :fasta
-    
-    
-
-    # mientras hay lineas en el fichero
-    while (!@fastq_file.eof)
-      revert_pos = @fastq_file.pos
-      # lee una linea
-      reading = :name
-      
-      line = @fastq_file.readline; line.chomp!
-
-      # if reading == :seq_name
-        
-      if reading == :name
-        # si la linea es una nueva secuencia comienza por @
-        if ((line =~ /^@/))
-          #get only name
-        
-          # si hay algo que devolver, romper bucle
-          if !seq_fasta.nil?
-            @fastq_file.pos=revert_pos
-            break
-          end
-        
-          # remove starting
-          line.gsub!(/^@\s*/,'')
-        
-          line =~ /(^[^\s]+)\s*(.*)$/
-          # remove comments
-          seq_name = $1
-          comments=$2
-        
-          seq_fasta=''
-          seq_qual=''
-        
-          reading = :fasta
-        elsif ((line =~ /^+/))
-        
-          reading = :qual
-        end
-        
-      # elsif ((line =~ /^\+#{seq_name}/)) || ((line =~ /^\+\s*$/))
-        
-      elsif reading == :fasta
-          #add line to fasta of seq
-  
-          line.strip! if !line.empty?
-        
-          seq_fasta+=line;
-          seq_fasta.strip! if !seq_fasta.empty?
-      elsif reading == :qual
-  
-          line.strip! if !line.empty?
-        
-          seq_qual+=line;
-          seq_qual.strip! if !seq_qual.empty?
-      end
-    end
-    
-    if !seq_name.nil? && !seq_qual.empty?
-
-       @num_seqs += 1
-       
-       if @qual_to_phred
-         seq_qual=seq_qual.each_char.map{|e| (@to_phred.call(e.ord))}
-
-         if !@qual_to_array
-             seq_qual=seq_qual.join(' ')
-         end
-       end
-       
-    end
-    
-    return [seq_name,seq_fasta,seq_qual,comments]
-  end
-
-  def read_fastq_old
-
-    seq_name = nil
-    seq_fasta = nil
-    seq_qual = nil
-    comments = nil
-    
-    reading = :fasta
-
-    # mientras hay lineas en el fichero
-    while (!@fastq_file.eof)
-      revert_pos = @fastq_file.pos
-      # lee una linea
-      line = @fastq_file.readline; line.chomp!
-
-      # si la linea es una nueva secuencia
-      if ((line =~ /^@/))
-        #get only name
-        
-        # si hay algo que devolver, romper bucle
-        if !seq_fasta.nil?
-          @fastq_file.pos=revert_pos
-          break
-        end
-        
-        # remove starting
-        line.gsub!(/^@\s*/,'')
-        
-        line =~ /(^[^\s]+)\s*(.*)$/
-        # remove comments
-        seq_name = $1
-        comments=$2
-        
-        seq_fasta=''
-        seq_qual=''
-        
-        reading = :fasta
-        
-        
-      elsif ((line =~ /^\+#{seq_name}/)) || ((line =~ /^\+\s*$/))
-        reading = :qual
-        
-      else # no es una linea de nombre, añadir al fasta o al qual
-        
-        line.strip! if !line.empty?
-        
-        if reading == :fasta
-          #add line to fasta of seq
-          seq_fasta+=line;
-          seq_fasta.strip! if !seq_fasta.empty?
-	      
-        else # reading qual 
-          seq_qual+=line;
-          seq_qual.strip! if !seq_qual.empty?
-        end  
-      end
-    end
-    
-    if !seq_name.nil? && !seq_qual.empty?
-
-       @num_seqs += 1
-       
-       if @qual_to_phred
-         seq_qual=seq_qual.each_char.map{|e| (@to_phred.call(e.ord))}
-
-         if !@qual_to_array
-             seq_qual=seq_qual.join(' ')
-         end
-       end
-       
     end
     
     return [seq_name,seq_fasta,seq_qual,comments]

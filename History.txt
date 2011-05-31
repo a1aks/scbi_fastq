@@ -1,4 +1,7 @@
+=== 0.0.14 2011-05-31
+
+release to rubygems
+
 === 0.0.1 2010-11-29
 
-* 1 major enhancement:
-  * Initial release
+* Initial release

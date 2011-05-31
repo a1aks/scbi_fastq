@@ -3,5 +3,5 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 require 'scbi_fastq/fastq_file'
 module ScbiFastq
-  VERSION = '0.0.13'
+   VERSION = '0.0.14'
 end

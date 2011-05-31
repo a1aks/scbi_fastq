@@ -74,6 +74,33 @@ class TestScbiFastq < Test::Unit::TestCase
 		  fqr.close			
   end
 
+  def test_next_seq_comments
+
+    	 # make new file and fill with data
+		  fill_file(100) 	
+		
+
+			fqr=FastqFile.new(@test_file)
+
+			i=1
+			
+			begin
+			  n,s,q,c = fqr.next_seq
+
+			  if !n.nil?
+			  assert_equal(@seq_name+i.to_s,n)
+			  assert_equal(@seq_fasta*i,s)
+			  assert_equal((@seq_qual*i*@seq_fasta.length),q)
+			  assert_equal('comments',c)
+
+				i+=1
+			  end
+			end until n.nil?
+			 
+		  fqr.close			
+  end
+
+
   
   # def test_open_file
   #   fill_file(100)
