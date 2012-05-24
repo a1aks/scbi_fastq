@@ -77,7 +77,7 @@ class TestScbiFastq < Test::Unit::TestCase
   def test_next_seq_comments
 
     	 # make new file and fill with data
-		  fill_file(100) 	
+		  fill_file(100)
 		
 
 			fqr=FastqFile.new(@test_file)
@@ -97,7 +97,13 @@ class TestScbiFastq < Test::Unit::TestCase
 			  end
 			end until n.nil?
 			 
-		  fqr.close			
+		  fqr.close
+  end
+  
+  def test_to_fastq
+    puts FastqFile.to_fastq(@seq_name,@seq_fasta*10,'','')
+    
+    
   end
 
 

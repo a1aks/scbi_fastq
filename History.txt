@@ -1,3 +1,7 @@
+=== 0.0.15 2012-05-24
+
+Uses default qual when no qual is present
+
 === 0.0.14 2011-05-31
 
 release to rubygems
