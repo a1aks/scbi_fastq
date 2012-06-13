@@ -29,6 +29,24 @@ class TestScbiFastq < Test::Unit::TestCase
   	f.close
   end
 
+  def fill_file_no_qual(n,offset=33)
+  	f=FastqFile.new(@test_file,'w')
+  	
+  	n.times do |c|
+  	  i = c+1
+  	  
+  	  name = "#{@seq_name+i.to_s}"
+  	  f.write_seq(name,@seq_fasta*i,'','comments')
+      # f.puts('@'+name)
+      # f.puts(@seq_fasta*i)
+      # f.puts('+'+name)
+      # f.puts((@seq_qual*i*@seq_fasta.length).map{|e| (e+offset).chr}.join)
+  	end
+  	
+  	f.close
+  end
+
+
   def test_each
 
     	 # make new file and fill with data
@@ -103,8 +121,30 @@ class TestScbiFastq < Test::Unit::TestCase
   def test_to_fastq
     puts FastqFile.to_fastq(@seq_name,@seq_fasta*10,'','')
     
-    
   end
+  
+  def test_each_no_qual
+
+    	 # make new file and fill with data
+		  fill_file_no_qual(100)
+		
+
+			fqr=FastqFile.new(@test_file,'r',:sanger, false,false)
+
+			i=1
+			
+			fqr.each do |n,s,q|
+        puts n,s,q
+        assert_equal(@seq_name+i.to_s,n)
+        assert_equal(@seq_fasta*i,s)
+        # assert_equal((@seq_qual*i*@seq_fasta.length),q)
+
+				i+=1
+			end
+			 
+		  fqr.close			
+  end
+  
 
 
   

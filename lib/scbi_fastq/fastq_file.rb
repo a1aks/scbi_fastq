@@ -171,15 +171,15 @@ class FastqFile
     res << ("+#{seq_name} #{comments}")
 
     if !seq_qual.empty?
-      if @qual_to_phred
+      # if @qual_to_phred
         if seq_qual.is_a?(Array)
           res<<(seq_qual.map{|e| (e+33).chr}.join)
         else
           res<<(seq_qual.split(/\s+/).map{|e| (e.to_i+33).chr}.join)
         end
-      else
-        res << seq_qual
-      end
+      # else
+      #   res << seq_qual
+      # end
     else # no qual provided, use a default value
       q='D'*seq_fasta.length;
       res << q
@@ -220,6 +220,12 @@ class FastqFile
           seq_fasta = @fastq_file.readline.chomp
           name2_line = @fastq_file.readline.chomp
           seq_qual = @fastq_file.readline.chomp
+          
+          
+          # if there is no qual, but there is a fasta
+          if seq_qual.empty? && !seq_fasta.empty?
+            seq_qual = 'D'*seq_fasta.length
+          end
 
 
           # parse name
